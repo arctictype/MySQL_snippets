@@ -1,0 +1,4 @@
+##Trigger that automatically calculates and ammends dyears (years since acquiring driver licence)
+
+CREATE TRIGGER dyearAdjust BEFORE INSERT ON Drivers FOR EACH ROW SET 
+NEW.dyear = IF((NEW.age - NEW.dyear) < 16, (NEW.age - 16), NEW.dyear);
