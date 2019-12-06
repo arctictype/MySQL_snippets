@@ -1,0 +1,6 @@
+##Use when setting limiting criteria for database entries.
+##Example - If entering Drivers ID into a drivers license database, a trigger function ensure the data meets limiting criteria.
+##In this particular case you could set a trigger where when a user attempts to enter an age <16 it return an error.
+##The following trigger assign null to the age column and since the column is set to not null an error is returned:
+
+CREATE TRIGGER ageCheck BEFORE INSERT ON Drivers FOR EACH ROW SET NEW.did = IF (NEW.age < 16, NULL , NEW.did);
