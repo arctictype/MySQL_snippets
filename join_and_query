@@ -1,0 +1,22 @@
+SELECT 
+		P.product,
+		P.yr_orderdate,
+        P.yr_price,
+        M.yr_price AS last_year_price,
+        
+        (P.yr_price - M.yr_price) / NULLIF(M.yr_price, 0) AS increase_rate
+FROM 
+    ( 
+        SELECT N.product, YEAR(O.placed_on) AS yr_orderdate, SUM(Itms.price * Itms.quantity) / SUM(Itms.quantity) AS yr_price
+        FROM shopify.product_variations AS N
+            INNER JOIN shopify.order_items AS Itms ON Itms.product_variation = N.id
+            INNER JOIN shopify.orders AS O ON O.id = Itms.order
+        GROUP BY N.product, YEAR(O.placed_on)
+    ) P
+    LEFT JOIN ( 
+        SELECT N.product, YEAR(O.placed_on) AS yr_orderdate, SUM(Itms.price * Itms.quantity) / SUM(Itms.quantity) AS yr_price
+        FROM shopify.product_variations AS N
+            INNER JOIN shopify.order_items AS Itms ON Itms.product_variation = N.id
+            INNER JOIN shopify.orders AS O ON O.id = Itms.order
+        GROUP BY N.product, YEAR(O.placed_on)
+    ) M ON M.product = P.product AND M.yr_orderdate = P.yr_orderdate - 1
